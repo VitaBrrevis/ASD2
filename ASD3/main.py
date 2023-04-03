@@ -24,92 +24,104 @@ def algorithm1(array):
     sorted_array = list(array)  # make a copy of the original array
     quicksort(sorted_array, 0, len(array) - 1)
     return sorted_array, comparisons
-
+"""
+def insertion_sort(array, low, high, counts):
+    for i in range(low+1, high+1):
+        key = array[i]
+        j = i-1
+        while j >= low and key < array[j]:
+            array[j+1] = array[j]
+            j -= 1
+            counts += 1
+        array[j+1] = key
+    return counts
 
 def algorithm2(array):
+    def partition(array, low, high, counts):
+        pivot = array[high]
+        i = low - 1
+        for j in range(low, high):
+            counts[0] += 1
+            if array[j] <= pivot:
+                counts[1] += 1
+                i += 1
+                (array[i], array[j]) = (array[j], array[i])
+        (array[i + 1], array[high]) = (array[high], array[i + 1])
+        return i + 1
+
+    def quick_sort_median(array, low, high, counts):
+        if high - low > 2:
+            n = high - low + 1
+            pivot_idx = median_of_three(array, low, low + n // 2, high)
+            array[pivot_idx], array[high] = array[high], array[pivot_idx]
+            q = partition(array, low, high, counts)
+            quick_sort_median(array, low, q - 1, counts)
+            quick_sort_median(array, q + 1, high, counts)
+        else:
+            insertion_sort(array, low, high, counts)
+
+    def median_of_three(array, a, b, c):
+        if array[a] < array[b]:
+            if array[b] < array[c]:
+                return b
+            elif array[a] < array[c]:
+                return c
+            else:
+                return a
+        else:
+            if array[a] < array[c]:
+                return a
+            elif array[b] < array[c]:
+                return c
+            else:
+                return b
+"""""
+def algorithm21(array):
     comparisons = 0
 
-    def quicksort(array, p, r):
+    def quicksort(array, low, high):
         nonlocal comparisons
-        if p < r:
-            if r - p + 1 <= 3:  # sort subarrays of size 3 or less without partitioning
-                comparisons += 3
-                sorted_array = sorted(array[p:r+1])
-                return sorted_array
-            else:
-                comparisons += 3
-                median_index = (p + r) // 2
-                median = sorted([array[p], array[median_index], array[r]])[1]
-                i = p - 1
-                for j in range(p, r):
+        if high - low + 1 <= 3:  # sort subarrays of size 3 or less without partitioning
+            sorted_array = sorted(array[low:high+1])
+            size = high - low + 1
+            match size:
+                case 3:
+                    comparisons += 3
+                case 2:
                     comparisons += 1
-                    if array[j] <= median:
-                        i += 1
-                        array[i], array[j] = array[j], array[i]
-                array[i+1], array[r] = array[r], array[i+1]
-                q = i + 1
-                left = quicksort(array, p, q - 1)
-                right = quicksort(array, q + 1, r)
-                sorted_array = left + [array[q]] + right
-                return sorted_array
+            return sorted_array
+        else:
+            median_index = (low + high) // 2
+            median = sorted([array[low], array[median_index], array[high]])[1]
+            median_index = array.index(median)
+            """
+
+            array[high], array[median_index] = array[median_index], array[high]
+            array, comparisons = algorithm1(array)
+            """
+            i = low - 1
+            for j in range(low, high + 1):
+                if array[j] != array[median_index]:
+                    comparisons += 1
+                if array[j] <= median:
+                    i += 1
+                    array[i], array[j] = array[j], array[i]
+            median_index = array.index(median)
+            array[i], array[median_index] = array[median_index], array[i]
+            q = i
+            left = quicksort(array, low, q - 1 )
+            right = quicksort(array, q + 1, high)
+            sorted_array = ( left if left is not None else [] ) + [array[q]]+ ( right if right is not None else [] )
+            return sorted_array
+
 
     sorted_array = quicksort(array, 0, len(array) - 1)
     return sorted_array, comparisons
 
-
-def partition(array, p, r):
-    # Choose three pivot elements
-    q1 = p
-    q2 = (p + r) // 2
-    q3 = r
-
-    # Sort pivot elements
-    if array[q1] > array[q2]:
-        array[q1], array[q2] = array[q2], array[q1]
-    if array[q2] > array[q3]:
-        array[q2], array[q3] = array[q3], array[q2]
-    if array[q1] > array[q2]:
-        array[q1], array[q2] = array[q2], array[q1]
-
-    # Partition array
-    i = j = p
-    k = r
-    comparisons = 0
-    while j <= k:
-        if array[j] < array[q1]:
-            array[i], array[j] = array[j], array[i]
-            i += 1
-            j += 1
-            comparisons += 1
-        elif array[j] >= array[q1] and array[j] < array[q2]:
-            j += 1
-            comparisons += 1
-        elif array[j] >= array[q2] and array[j] < array[q3]:
-            array[j], array[k] = array[k], array[j]
-            k -= 1
-            comparisons += 1
-        else:
-            array[k], array[j] = array[j], array[k]
-            k -= 1
-            j -= 1
-            comparisons += 1
-
-    return i, j, comparisons
-
-
-def quicksort(array, p, r):
-    comparisons = 0
-    if p < r:
-        i, j, comparisons = partition(array, p, r)
-        comparisons += quicksort(array, p, i - 1)
-        comparisons += quicksort(array, j, r)
-    return comparisons
-
-
-def algorithm3(array):
-    comparisons = quicksort(array, 0, len(array) - 1)
-    sorted_array = array
-    return sorted_array, comparisons
+#def algorithm3(array):
+ #   comparisons = quicksort(array, 0, len(array) - 1)
+  #  sorted_array = array
+   # return sorted_array, comparisons
 
 input_file = sys.argv[1]
 output_file = sys.argv[2]
@@ -122,7 +134,7 @@ comparisons1 = 0
 sorted_array1, comparisons1 = algorithm1(array)
 
 comparisons2 = 0
-sorted_array2, comparisons2 = algorithm2(array)
+sorted_array2, comparisons2 = algorithm21(array)
 
 #comparisons3 = 0
 #sorted_array3, comparisons3 = algorithm3(array)
