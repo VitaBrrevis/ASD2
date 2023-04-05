@@ -131,6 +131,8 @@ def algorithm21(array):
     sorted_array, comparisons, swaps = quicksort(array, 0, len(array) - 1, comparisons, swaps)
     return sorted_array, comparisons, swaps
 
+import random
+
 def quicksort_3way(array, p, r):
     comparisons = 0
     if r - p <= 2:
@@ -141,6 +143,7 @@ def quicksort_3way(array, p, r):
         comparisons += 1
         return comparisons
 
+    random.seed(42)
     q1, q2, q3 = random.sample(range(p, r), 3)
     if array[q1] > array[q2]:
         array[q1], array[q2] = array[q2], array[q1]
