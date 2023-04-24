@@ -48,6 +48,26 @@ def is_bridge(g, u, v):
                     stack.append(i)
     return not visited[v]
 
+def graph_validate(graph):
+
+    length = len(graph)
+    one = False
+    for i in range(length):
+
+        # validation for isolation
+        if not ( 1 in graph[i] ):
+            one = True
+            break
+
+        # validation for even number of connections
+        if sum(graph[i]) % 2:
+            one = True
+            break
+
+    if one:
+        return False
+    return True
+
 
 
 def generate_random_graph(n):
@@ -80,9 +100,12 @@ if __name__ == '__main__':
     elif option.upper() == 'R':
         graph = generate_random_graph(n)
     else:
-        print("Invalid input. Please enter 'M' or 'R'.")
+        print("Invalid input. Please enter 'M' or 'R'.\n")
         exit()
 
+    if graph_validate(graph):
+        cycle = fleury_algorithm(graph)
+        print("Eulerian cycle:", ' -> '.join(str(x) for x in cycle))
+    else:
+        print("\nThe graph didn't pass the validation:\n there is either isolated nodes or\n the number of connections of some nodes are not even")
 
-    cycle = fleury_algorithm(graph)
-    print("Eulerian cycle:", ' -> '.join(str(x) for x in cycle))
