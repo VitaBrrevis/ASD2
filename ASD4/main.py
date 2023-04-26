@@ -1,73 +1,76 @@
 import random
-def fleury_algorithm(graph):
+import networkx as nx
+import numpy as np
+import matplotlib.pyplot as plt
 
-    g = [row[:] for row in graph]
-    n = len(g)
-    m = sum(len(row) for row in g) // 2
-    cycle = [0]
-    v = 0
-    while len(cycle) < m + 1:
-        edge_index = -1
-        for i in range(len(g[v])):
-            if g[v][i]:
-                if edge_index == -1:
-                    edge_index = i
-                elif not is_bridge(g, v, i):
-                    edge_index = i
-                    break
-        if edge_index == -1:
-            break
-        cycle = insert_edge(cycle, edge_index, v)
-        g[v][edge_index] = g[edge_index][v] = 0
-        v = cycle[edge_index]
-        if v not in cycle:
-            v = cycle[-1]
-    return cycle
-
-
-def insert_edge(cycle, edge_index, v):
-    if edge_index + 1 == len(cycle):
-        cycle.append(v)
-    elif edge_index + 1 < len(cycle):
-        cycle[edge_index + 1], cycle[edge_index] = cycle[edge_index], cycle[edge_index + 1]
-    else:
-        cycle.append(v)
-    return cycle
-
-
-def is_bridge(g, u, v):
-    n = len(g)
-    visited = [False] * n
-    stack = [u]
-    while stack:
-        x = stack.pop()
-        if not visited[x]:
-            visited[x] = True
-            for i in range(n):
-                if g[x][i] and i != v and not (x == u and i == v):
-                    stack.append(i)
-    return not visited[v]
-
-
-
+def graphix (graph):
+    G = nx.DiGraph(np.matrix(graph))
+    nx.draw(G, with_labels=True, node_size=300, arrows=False)
+    plt.show()
+def graph_validate(graph):
+    for row in graph:
+        if sum(row) % 2 != 0 or sum(row) == 0 :
+            return False
+    return True
 def generate_random_graph(n):
-    graph = [[0] * n for _ in range(n)]
+
+    graph = [[0 for _ in range(n)] for _ in range(n)]
+
     for i in range(n):
-        for j in range(i):
+        for j in range(i + 1, n):
             if random.choice([True, False]):
-                graph[i][j] = graph[j][i] = 1
+                graph[i][j] = 1
+                graph[j][i] = 1
+
+    for i in range(n):
+        if sum(graph[i]) % 2 != 0:
+            j = random.randrange(n)
+            while i == j or graph[i][j] == 1:
+                j = random.randrange(n)
+            graph[i][j] = 1
+            graph[j][i] = 1
+
     return graph
-
-def is_eulerian(graph):
+def print_graph(graph):
     n = len(graph)
-    degree_sequence = [sum(graph[i]) for i in range(n)]
-    return all(d % 2 == 0 for d in degree_sequence)
-
-def dfs(node, visited, graph):
-    visited[node] = True
-    for i in range(len(graph[node])):
-        if graph[node][i] and not visited[i]:
-            dfs(i, visited, graph)
+    for i in range(n):
+        for j in range(n):
+            print(graph[i][j], end=" ")
+        print()
+def fleury_algorithm(graph):
+    def index_s(line):
+        index = -1
+        for i in range(len(line)):
+            if line[i] == 1:
+                index = i
+                return index
+        return index
+    def is_empty(graph):
+        for i in range(len(graph)):
+            for j in range(len(graph)):
+                if graph[i][j]!=0:
+                    return False
+        return True
+    def standart(graph):
+        nonlocal j
+        while (not is_empty(graph)):
+            index = index_s(graph[j])
+            if index != -1:
+                S.append(index)
+                graph[j][index] = 0
+                graph[index][j] = 0
+                j = index
+            else:
+                C.append(S.pop())
+                j = S[-1]
+    C = []
+    S = []
+    j = 0
+    S.append(0)
+    standart(graph)
+    while (len(S)!=0):
+        C.append(S.pop())
+    return C
 
 if __name__ == '__main__':
     n = int(input("Enter number of vertices: "))
@@ -79,10 +82,32 @@ if __name__ == '__main__':
             graph.append(row)
     elif option.upper() == 'R':
         graph = generate_random_graph(n)
+        print_graph(graph)
     else:
-        print("Invalid input. Please enter 'M' or 'R'.")
+        print("Invalid input. Please enter 'M' or 'R'.\n")
         exit()
 
+    graph = [[0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
+             [0, 0, 0, 0, 1, 0, 0, 1, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 1, 1, 0],
+             [0, 0, 0, 0, 0, 1, 0, 1, 1, 1],
+             [0, 1, 0, 0, 0, 1, 1, 0, 1, 0],
+             [1, 0, 0, 1, 1, 0, 1, 0, 0, 0],
+             [1, 0, 0, 0, 1, 1, 0, 1, 0, 0],
+             [0, 1, 1, 1, 0, 0, 1, 0, 0, 0],
+             [0, 0, 1, 1, 1, 0, 0, 0, 0, 1],
+             [0, 0, 0, 1, 0, 0, 0, 0, 1, 0]]
 
-    cycle = fleury_algorithm(graph)
-    print("Eulerian cycle:", ' -> '.join(str(x) for x in cycle))
+    """
+    graph = [[0, 1, 1, 1, 1],
+             [1, 0, 0, 1, 0],
+             [1, 0, 0, 1, 0],
+             [1, 1, 1, 0, 1],
+             [1, 0, 0, 1, 0]]
+             """
+    if graph_validate(graph):
+        graphix(graph)
+        cycle = fleury_algorithm(graph)
+        print("Eulerian cycle:", ' -> '.join(str(x) for x in cycle))
+    else:
+        print("\nThe graph didn't pass the validation:\n there is either isolated nodes or\n the number of connections of some nodes are not even")
