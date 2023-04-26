@@ -32,6 +32,7 @@ def generate_random_graph(n):
 
     return graph
 def print_graph(graph):
+    print("the matrix analyzed:")
     n = len(graph)
     for i in range(n):
         for j in range(n):
