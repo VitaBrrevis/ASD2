@@ -80,7 +80,7 @@ def animate_eulerian_cycle(graph, cycle):
         plt.title("Step " + str(i+1))
 
     # Создаем анимацию
-    ani = FuncAnimation(fig, animate, frames=len(cycle), interval=500, repeat=False)
+    ani = FuncAnimation(fig, animate, frames=len(cycle), interval=200, repeat=False)
 
     plt.show()
 def graphix (graph):

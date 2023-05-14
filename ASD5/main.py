@@ -7,20 +7,30 @@ import heapq
 
 class MedianFinder:
     def __init__(self):
+        if len(self.low) == 0:
         self.low = []    # max-heap
         self.high = []   # min-heap
 
     def addNum(self, num: int) -> None:
-        if len(self.low) == len(self.high):
-            heapq.heappush(self.high, -heapq.heappushpop(self.low, -num))
+            heapq.heappush(self.low, -num)
+        elif num < abs(self.low[0]):
+            heapq.heappush(self.low,  -num)
         else:
-            heapq.heappush(self.low, -heapq.heappushpop(self.high, num))
+            heapq.heappush(self.high,  num)
+
+        if len(self.low) >= ( len(self.high) + 2):
+            heapq.heappush(self.high, -heapq.heappop(self.low))
+        elif len(self.high) >= ( len(self.low) + 2):
+            heapq.heappush(self.low, -heapq.heappop(self.high))
 
     def findMedian(self) -> float:
         if len(self.low) == len(self.high):
-            return (self.high[0] - self.low[0]) / 2.0
+            return -self.low[0], self.high[0]
+        elif len(self.low) > len(self.high):
+            return -self.low[0]
         else:
-            return float(self.high[0])
+            return self.high[0]
+
 
 def read_input_file(input_file):
     with open(input_file, 'r') as file:
@@ -43,10 +53,7 @@ def calculate_medians(n, a):
     mf = MedianFinder()
     for i in range(n):
         mf.addNum(a[i])
-        if i % 2 == 0:
-            median = abs(int(mf.findMedian()))
-        else:
-            median = (abs(int(mf.low[0])), abs(int(mf.high[0])))
+        median = mf.findMedian()
         medians.append(median)
     return medians
 

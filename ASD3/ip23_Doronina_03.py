@@ -227,7 +227,7 @@ print("comparisons3: ", comparisons3, "sorted_array3: ", arr2)
 with open(output_file, 'w') as f:
      f.write(f'{comparisons1} {comparisons2} {comparisons3}')
 
-size = 1000
+size = 500
 arr_r = sv.create_random_array(size)
 
 arr_r1 = arr_r.copy()
@@ -235,7 +235,7 @@ arr_r2 = arr_r.copy()
 y_best1, y_worst1, y_random1 = sv.measuring_operations(size, algorithm1, arr_r)
 y_best2, y_worst2, y_random2 = sv.measuring_operations(size, algorithm2, arr_r1)
 y_best3, y_worst3, y_random3 = sv.measuring_operations(size, algorithm3, arr_r2)
-line_labels = ["asc", "desc", "random"]
-chart_labels = ["first", "second", "third"]
-#sv.build_line_charts(3, "comps + swaps", 3, line_labels, chart_labels, y_best1, y_worst1, y_random1, y_best2, y_worst2, y_random2, y_best3, y_worst3, y_random3)
+line_labels = ["sorted", "!sorted", "random"]
+chart_labels = ["1pivot", "2pivot", "third"]
+sv.build_line_charts(3, "comps + swaps", 2, line_labels, chart_labels, y_best1, y_worst1, y_random1, y_best2, y_worst2, y_random2, y_best3, y_worst3, y_random3)
 #sv.build_line_charts1(3, "comps + swaps", 3, line_labels, chart_labels, y_best1, y_worst1, y_random1, y_best2, y_worst2, y_random2, y_best3, y_worst3, y_random3)
