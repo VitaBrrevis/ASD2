@@ -128,7 +128,6 @@ map = generate_map(size)
 
 #map.display_table()
 
-
 result = map.search('test')
 if result:
     print("Знайдено:", result)
