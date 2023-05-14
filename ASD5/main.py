@@ -12,6 +12,10 @@ class MedianFinder:
         self.high = []   # min-heap
 
     def addNum(self, num: int) -> None:
+<<<<<<< HEAD
+=======
+        if len(self.low) == 0:
+>>>>>>> eb2d29d6617e7f33ef7f371e832866b03db9a84c
             heapq.heappush(self.low, -num)
         elif num < abs(self.low[0]):
             heapq.heappush(self.low,  -num)
