@@ -19,70 +19,79 @@
 сполучення між ними. Для визначення відстані рекомендується використовувати
 інтернет сервіси (наприклад Google Maps).
 """""
-from itertools import permutations
-from math import sqrt
+import math
 
-# Список міст в Аргентині з координатами їх центрів
+def calculate_distance(lat1, lng1, lat2, lng2):
+    """
+    Обчислює відстань між двома координатами (в кілометрах).
+    """
+    radius = 6371  # Радіус Землі в кілометрах
+
+    dlat = math.radians(lat2 - lat1)
+    dlng = math.radians(lng2 - lng1)
+    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
+        * math.cos(math.radians(lat2)) * math.sin(dlng/2) * math.sin(dlng/2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    distance = radius * c
+
+    return distance
+
+def find_shortest_route(cities):
+    num_cities = len(cities)
+    visited = [False] * num_cities  # Список, що позначає, чи було місто відвідане
+    route = []  # Маршрут
+
+    # Вибір початкового міста (City1)
+    start_city = cities[0]
+    current_city = start_city
+    visited[0] = True
+    route.append(start_city['name'])
+
+    # Пошук найближчого до поточного міста
+    for _ in range(num_cities - 1):
+        min_distance = float('inf')
+        nearest_city = None
+
+        for city in cities:
+            if not visited[cities.index(city)]:
+                distance = calculate_distance(current_city['lat'], current_city['lng'],
+                                              city['lat'], city['lng'])
+                if distance < min_distance:
+                    min_distance = distance
+                    nearest_city = city
+
+        current_city = nearest_city
+        visited[cities.index(current_city)] = True
+        route.append(current_city['name'])
+
+    # Додавання останнього міста для завершення циклу
+    distance = calculate_distance(current_city['lat'], current_city['lng'],
+                                  start_city['lat'], start_city['lng'])
+    route.append(start_city['name'])
+
+    return route, distance
+
 cities = [
-    {'name': 'City1', 'lat': 40.7128, 'lng': -74.0060},
-    {'name': 'City2', 'lat': 34.0522, 'lng': -118.2437},
-    {'name': 'City3', 'lat': 41.8781, 'lng': -87.6298},
-    {'name': 'City4', 'lat': 29.7604, 'lng': -95.3698},
-    {'name': 'City5', 'lat': 39.9526, 'lng': -75.1652},
-    {'name': 'City6', 'lat': 32.7157, 'lng': -117.1611},
-    {'name': 'City7', 'lat': 47.6062, 'lng': -122.3321},
-    {'name': 'City8', 'lat': 37.7749, 'lng': -122.4194},
-    {'name': 'City9', 'lat': 38.9072, 'lng': -77.0369},
-    {'name': 'City10', 'lat': 33.4484, 'lng': -112.0740},
-    {'name': 'City11', 'lat': 42.3601, 'lng': -71.0589},
-    {'name': 'City12', 'lat': 45.5051, 'lng': -122.6750},
-    {'name': 'City13', 'lat': 36.1699, 'lng': -115.1398},
-    {'name': 'City14', 'lat': 38.5816, 'lng': -121.4944},
-    {'name': 'City15', 'lat': 25.7617, 'lng': -80.1918}
+    {'name': 'Буенос-Айрес', 'lat': -34.6037, 'lng': -58.3816},
+    {'name': 'Кордова', 'lat': -31.4201, 'lng': -64.1888},
+    {'name': 'Росаріо', 'lat': -32.9442, 'lng': -60.6505},
+    {'name': 'Мендоса', 'lat': -32.8895, 'lng': -68.8458},
+    {'name': 'Сан-Мігель-де-Тукуман', 'lat': -26.8167, 'lng': -65.2167},
+    {'name': 'Ла-Плата', 'lat': -34.9206, 'lng': -57.9536},
+    {'name': 'Мар-дель-Плата', 'lat': -38.0055, 'lng': -57.5426},
+    {'name': 'Салта', 'lat': -24.7829, 'lng': -65.4122},
+    {'name': 'Санта-Фе', 'lat': -31.6333, 'lng': -60.7000},
+    {'name': 'Сан-Хуан', 'lat': -31.5375, 'lng': -68.5364},
+    {'name': 'Сан-Луїс', 'lat': -33.3016, 'lng': -66.3378},
+    {'name': 'Тукуман', 'lat': -26.8241, 'lng': -65.2226},
+    {'name': 'Реконкіста', 'lat': -29.1395, 'lng': -59.6500},
+    {'name': 'Нюкві-Берга', 'lat': -41.1335, 'lng': -71.3103},
+    {'name': 'Посадас', 'lat': -27.3621, 'lng': -55.9007},
+    {'name': 'Санта-Роса', 'lat': -36.6167, 'lng': -64.2833}
 ]
 
+route, distance = find_shortest_route(cities)
 
-# Функція для обчислення відстані між двома координатами
-def calculate_distance(lat1, lng1, lat2, lng2):
-    return sqrt((lat2 - lat1) ** 2 + (lng2 - lng1) ** 2)
-
-
-# Знаходимо найкоротшу відстань між усіма парами міст
-distances = {}
-for i in range(len(cities)):
-    for j in range(len(cities)):
-        if i != j:
-            city1 = cities[i]
-            city2 = cities[j]
-            distance = calculate_distance(city1['lat'], city1['lng'], city2['lat'], city2['lng'])
-            distances[(city1['name'], city2['name'])] = distance
-
-
-# Жадібний пошук методом включення найближчої вершини
-def find_shortest_route(cities, distances):
-    shortest_distance = float('inf')
-    shortest_route = None
-
-    for permutation in permutations(cities):
-        route_distance = 0
-        for i in range(len(permutation) - 1):
-            city1 = permutation[i]
-            city2 = permutation[i + 1]
-            route_distance += distances[(city1['name'], city2['name'])]
-
-        if route_distance < shortest_distance:
-            shortest_distance = route_distance
-            shortest_route = permutation
-
-    return shortest_route, shortest_distance
-
-
-# Знаходимо маршрут мінімальної довжини
-shortest_route, shortest_distance = find_shortest_route(cities, distances)
-
-# Формуємо відповідь
-route_str = ' → '.join(city['name'] for city in shortest_route)
-answer = f"Маршрут: {route_str}, Довжина: {shortest_distance}км."
-
-# Виводимо результат
-print(answer)
+# Виведення результатів
+route_str = ' → '.join(route)
+print(f"Маршрут: {route_str}, Довжина: {distance} км")
